@@ -7,14 +7,20 @@
   Time: 11:33
   To change this template use File | Settings | File Templates.
 --%>
+
+<%--zdefniowane kodowanie strony--%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%--Expression language jest włączony--%>
 <%@ page isELIgnored="false" %>
+<%--JSTL jest włączony--%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
 <html>
 <head>
     <title>MyAlbums</title>
 </head>
 
+<%--styl do obramowania tabelki--%>
 <style>
     table, th, td {
         border: 1px solid black;
@@ -23,16 +29,10 @@
 
 <body>
 
-<%
-    if (session.getAttribute("albums") == null) {
-        session.setAttribute("albums", new ArrayList<Album>());
-    }
-%>
-
-${param.submitted}
-
+<%--Formularz z polami. Nazwy pól (atrybut 'name' odpowiadają nazwom setterów w klasie--%>
+<%--Ukryte pole pozwala sprawdzić, czy formularz został wysłany, czy też strona jest
+otwarta po raz pierwszy--%>
 <form method="post">
-    <input type="hidden" name="submitted" value="true">
     Title:<br><input type="text" name="title"><br>
     Artist:<br><input type="text" name="artist"><br>
     Year:<br><input type="text" name="year"><br>
@@ -40,13 +40,10 @@ ${param.submitted}
     <input type="submit">
 </form>
 
-<c:if test="${param.submitted}">
-    <jsp:useBean id="newAlbum" class="pl.jnowacki.Album"/>
-    <jsp:setProperty name="newAlbum" property="*"/>
-    <%
-    ((List<Album>) session.getAttribute("albums")).add(newAlbum);
-%>
+<c:if test="${requestScope.invalid}">
+    <h1>Album is invalid!</h1>
 </c:if>
+
 
 <table>
     <tr>
@@ -56,8 +53,10 @@ ${param.submitted}
         <th>Year</th>
         <th>Genre</th>
     </tr>
+    <%--iterujemy się po wszystkich elementach listy albumów, przechowywanej w sesji--%>
     <c:forEach items="${sessionScope.albums}" var="album" varStatus="loop">
         <tr>
+                <%--używamy expression language żeby wyświetlić kolejne pola--%>
             <td>${loop.count}</td>
             <td>${album.title}</td>
             <td>${album.artist}</td>
